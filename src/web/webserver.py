@@ -94,7 +94,7 @@ class HTTPHandler(BaseHTTPRequestHandler):
         self.wfile.write(data)
 
     def _authorized(self, path_hash: Optional[str], params: dict[str, str]) -> None:
-        if path_hash is None or not path_hash.startswith("access_token="):
+        if path_hash is None:
             LOG.info(
                 f"Could not authorize: `{params.get("error_description", "No message")}`"
             )
@@ -102,7 +102,9 @@ class HTTPHandler(BaseHTTPRequestHandler):
             self.send_response(302, "Not authorized")
             self.send_header("Location", "/")
 
-        constants.CREDENTIALS.access_token = path_hash.split("=", 1)[1]
+        fragment = self._parse_get_params(path_hash)
+
+        constants.CREDENTIALS.access_token = fragment["access_token"]
 
         Thread(target=TwitchConn, daemon=True).start()
         # TODO: Send out event for control panel
