@@ -2,8 +2,9 @@ import abc
 from enum import Enum
 from typing import Any, Type
 
+import constants
 from log import LOG
-from src.twitch.events import EventTypes
+from twitch.events import EventTypes
 
 
 class TwitchMessage(abc.ABC):
@@ -24,7 +25,17 @@ class TwitchMessageWelcome(TwitchMessage):
         return "session_welcome"
 
     def handle(self):
+        constants.CREDENTIALS.session_id = self._data["payload"]["session"]["id"]
+
         EventTypes.register_all()
+
+
+class TwitchMessageKeepAlive(TwitchMessage):
+    def message_id(self):
+        return "session_keepalive"
+
+    def handle(self):
+        return
 
 
 class TwitchMessageNotification(TwitchMessage):
@@ -40,6 +51,8 @@ class TwitchMessageNotification(TwitchMessage):
 
 class MessageTypes(Enum):
     MESSAGE_WELCOME = TwitchMessageWelcome
+    MESSAGE_KEEP_ALIVE = TwitchMessageKeepAlive
+    MESSAGE_NOTIFICATION = TwitchMessageNotification
 
     def __init__(self, msg_cls: Type[TwitchMessage]):
         self._msg_cls = msg_cls
@@ -52,7 +65,7 @@ class MessageTypes(Enum):
         msg_type = json_data["metadata"]["message_type"]
 
         for _, cls in MessageTypes._member_map_.items():
-            inst: TwitchMessage = cls.value.for_data(json_data)
+            inst: TwitchMessage = cls.value(json_data)
             if inst.message_id() == msg_type:
                 inst.handle()
                 break

@@ -28,8 +28,8 @@ class TwitchConn:
 
         MessageTypes.handle(json_data)
 
-    def _on_ping(self, ws: websocket.WebSocket, message: Optional[bytes]) -> None:
-        ws.pong(message)
+    def _on_ping(self, ws: websocket.WebSocketApp, message: Optional[bytes]) -> None:
+        ws.sock.pong(message)
 
     def _on_close(
         self,

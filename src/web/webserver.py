@@ -3,32 +3,26 @@ import mimetypes
 import os
 from threading import Thread
 from typing import Optional
-from urllib.parse import urlencode
+from urllib.parse import quote
+
+from itsdangerous import NoneAlgorithm
 
 import constants
 from log import LOG
-from src.twitch.twitch import TwitchConn
+from twitch.twitch import TwitchConn
 
 
 class HTTPHandler(BaseHTTPRequestHandler):
-    RUNNING_SERVER: Optional[HTTPServer] = None
-
     @staticmethod
     def start_server() -> None:
-        if HTTPHandler.RUNNING_SERVER:
-            raise ValueError("A server is already running!")
-
         with HTTPServer(("localhost", constants.HTTP_PORT), HTTPHandler) as httpd:
             LOG.info(f"Serving on http://localhost:{constants.HTTP_PORT}")
             httpd.serve_forever()
 
-    @staticmethod
-    def shutdown() -> None:
-        if srv := HTTPHandler.RUNNING_SERVER:
-            srv.shutdown()
-
     def _parse_get_params(self, get_str: str) -> dict[str, str]:
         params = {}
+        if get_str == None:
+            return params
 
         for k in get_str.split("&"):
             if "=" in k:
@@ -39,7 +33,7 @@ class HTTPHandler(BaseHTTPRequestHandler):
 
         return params
 
-    def _split_path(self) -> tuple[str, Optional[str], dict[str, str]]:
+    def _split_path(self) -> tuple[str, dict[str, str]]:
         path = self.path
         path = path.split("?", 1)
         if len(path) == 2:
@@ -49,15 +43,7 @@ class HTTPHandler(BaseHTTPRequestHandler):
             params = {}
             path = path[0]
 
-        path = path.split("#", 1)
-        if len(path) == 2:
-            path_hash = path[1]
-            path = path[0]
-        else:
-            path_hash = None
-            path = path[0]
-
-        return path, path_hash, params
+        return path, params
 
     def _send_page(
         self, page_name: str, replacements: dict[bytes | str, bytes | str] = {}
@@ -93,18 +79,24 @@ class HTTPHandler(BaseHTTPRequestHandler):
 
         self.wfile.write(data)
 
-    def _authorized(self, path_hash: Optional[str], params: dict[str, str]) -> None:
-        if path_hash is None:
+    def _authorized(self, params: dict[str, str]) -> None:
+        if len(params) == 0:
+            self._send_page("authorize_frag.html")
+            return
+
+        access_token = params.get("access_token", None)
+
+        if access_token is None:
             LOG.info(
                 f"Could not authorize: `{params.get("error_description", "No message")}`"
             )
 
             self.send_response(302, "Not authorized")
             self.send_header("Location", "/")
+            self.end_headers()
+            return
 
-        fragment = self._parse_get_params(path_hash)
-
-        constants.CREDENTIALS.access_token = fragment["access_token"]
+        constants.CREDENTIALS.access_token = access_token
 
         Thread(target=TwitchConn, daemon=True).start()
         # TODO: Send out event for control panel
@@ -112,20 +104,28 @@ class HTTPHandler(BaseHTTPRequestHandler):
         self._send_page("authorized.html")
 
     def do_GET(self):
-        path, path_hash, params = self._split_path()
+        path, params = self._split_path()
 
         match path:
             case "/":
                 self._send_page(
                     "index.html",
                     {
-                        "{{CLIENT_ID}}": urlencode(constants.CLIENT_ID),
-                        "{{REDIRECT_URI}}": urlencode(constants.AUTH_REDIR),
-                        "{{SCOPE}}": urlencode(constants.SCOPE),
+                        "{{CLIENT_ID}}": quote(constants.CLIENT_ID),
+                        "{{REDIRECT_URI}}": quote(constants.AUTH_REDIR),
+                        "{{SCOPE}}": quote(constants.SCOPE),
                     },
                 )
             case "/authorized":
-                self._authorized(path_hash, params)
+                self._authorized(params)
+            case "/widget":
+                self._send_page("widget.html")
+            case "/widget.js":
+                self._send_page("widget.js")
+            case "/widget.css":
+                self._send_page("widget.css")
+            case "/tiny5.ttf":
+                self._send_page("tiny5/Tiny5.ttf")
 
             case _:
                 self.send_error(404, "Not Found", "This page could not be found! :(")

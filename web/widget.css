@@ -1,0 +1,37 @@
+@font-face {
+  font-family: "Tiny5";
+  src: url("/tiny5.ttf");
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+
+  font-family: "Tiny5", sans-serif;
+  background-color: rgba(0, 0, 0, 0);
+}
+
+#messages {
+  position: absolute;
+  left: 50px;
+  bottom: 50px;
+
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+#messages span.text {
+  font-size: 40px;
+}
+
+#messages span.combo {
+  font-size: 25px;
+}
+
+#messages div {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  align-items: baseline;
+}

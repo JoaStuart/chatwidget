@@ -1,11 +1,14 @@
 import abc
 from enum import Enum
-from tkinter import EventType
 from typing import Any, Optional
 
 import requests
 
-from src import constants
+from log import LOG
+import constants
+from twitch.utils import TwitchUtils
+from widget.combo import ComboManager
+from widget.widget_comm import CommServer
 
 
 class TwitchEvent(abc.ABC):
@@ -45,13 +48,9 @@ class TwitchEvent(abc.ABC):
         req.raise_for_status()
 
         body = req.json()
-
         sub_data = body["data"][0]
 
-        if sub_data & register_data != register_data:
-            raise ValueError(f"Twitch did not subscribe to the right topic: {body}")
-
-        self._id = body["data"][0]["id"]
+        self._id = sub_data["id"]
 
     def delete_event(self) -> None:
         if self._id is None:
@@ -68,17 +67,19 @@ class TwitchEvent(abc.ABC):
 
 class ChatReadEvent(TwitchEvent):
     def _register(self):
+        broadcaster_id = TwitchUtils.get_broadcaster_id(constants.BROADCASTER_NAME)
+
         return {
             "type": "channel.chat.message",
             "version": "1",
             "condition": {
-                "broadcaster_user_id": constants.BROADCASTER_ID,
-                "user_id": constants.BROADCASTER_ID,
+                "broadcaster_user_id": broadcaster_id,
+                "user_id": constants.TMP_USER_JOA,
             },
         }
 
     def trigger(self, event: dict[str, Any]) -> None:
-        pass  # TODO Handle chat message
+        ComboManager().read(event["message"]["text"])
 
 
 class EventTypes(Enum):
@@ -91,12 +92,13 @@ class EventTypes(Enum):
 
     @staticmethod
     def delete_all() -> None:
-        for _, val in EventType._member_map_.items():
+        for _, val in EventTypes._member_map_.items():
             val.value.delete_event()
 
     @staticmethod
     def trigger(id: str, event: dict[str, Any]) -> None:
-        for _, val in EventType._member_map_.items():
-            evt: TwitchEvent = val.value
+        for _, cls in EventTypes._member_map_.items():
+            evt: TwitchEvent = cls.value
+
             if evt.id == id:
                 evt.trigger(event)
