@@ -16,7 +16,6 @@ if __name__ != "__main__":
 Thread(target=HTTPHandler.start_server, name="WebServer", daemon=True).start()
 Thread(target=ComboManager().combo_thread, name="ComboManager", daemon=True).start()
 Thread(target=CommServer.recv_thread, name="CommsManager", daemon=True).start()
-Thread(target=CommServer.send_thread, name="CommsManager", daemon=True).start()
 
 
 MOCK_MESSAGES = [
@@ -35,3 +34,4 @@ except KeyboardInterrupt:
     LOG.info("Shutting down...")
 
 EventTypes.delete_all()
+TwitchConn().stop()

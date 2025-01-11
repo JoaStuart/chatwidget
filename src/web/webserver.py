@@ -2,13 +2,11 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 import mimetypes
 import os
 from threading import Thread
-from typing import Optional
 from urllib.parse import quote
-
-from itsdangerous import NoneAlgorithm
 
 import constants
 from log import LOG
+from twitch.credentials import Credentials
 from twitch.twitch import TwitchConn
 
 
@@ -96,9 +94,9 @@ class HTTPHandler(BaseHTTPRequestHandler):
             self.end_headers()
             return
 
-        constants.CREDENTIALS.access_token = access_token
+        Credentials().access_token = access_token
 
-        Thread(target=TwitchConn, daemon=True).start()
+        Thread(target=TwitchConn().run, daemon=True).start()
         # TODO: Send out event for control panel
 
         self._send_page("authorized.html")
@@ -121,11 +119,22 @@ class HTTPHandler(BaseHTTPRequestHandler):
             case "/widget":
                 self._send_page("widget.html")
             case "/widget.js":
-                self._send_page("widget.js")
+                self._send_page(
+                    "widget.js", {"{{WS_PORT}}": str(constants.HTTP_PORT + 1)}
+                )
             case "/widget.css":
                 self._send_page("widget.css")
             case "/tiny5.ttf":
                 self._send_page("tiny5/Tiny5.ttf")
+
+            case "/dashboard":
+                self._send_page("dashboard.html")
+            case "/dashboard.js":
+                self._send_page(
+                    "dashboard.js", {"{{WS_PORT}}": str(constants.HTTP_PORT + 1)}
+                )
+            case "/dashboard.css":
+                self._send_page("dashboard.css")
 
             case _:
                 self.send_error(404, "Not Found", "This page could not be found! :(")

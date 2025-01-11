@@ -1,6 +1,7 @@
 import requests
 
 import constants
+from twitch.credentials import Credentials
 
 
 class TwitchUtils:
@@ -9,7 +10,7 @@ class TwitchUtils:
         resp = requests.get(
             f"{constants.TWITCH_USERS}?login={name}",
             headers={
-                "Authorization": f"Bearer {constants.CREDENTIALS.access_token}",
+                "Authorization": f"Bearer {Credentials().access_token}",
                 "Client-Id": constants.CLIENT_ID,
             },
         )

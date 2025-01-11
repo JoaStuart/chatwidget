@@ -6,9 +6,10 @@ import requests
 
 from log import LOG
 import constants
+from twitch.credentials import Credentials
 from twitch.utils import TwitchUtils
 from widget.combo import ComboManager
-from widget.widget_comm import CommServer
+from widget.config import Config
 
 
 class TwitchEvent(abc.ABC):
@@ -31,14 +32,14 @@ class TwitchEvent(abc.ABC):
         register_data = self._register() | {
             "transport": {
                 "method": "websocket",
-                "session_id": constants.CREDENTIALS.session_id,
+                "session_id": Credentials().session_id,
             }
         }
 
         req = requests.post(
             constants.TWITCH_EVENTSUB,
             headers={
-                "Authorization": f"Bearer {constants.CREDENTIALS.access_token}",
+                "Authorization": f"Bearer {Credentials().access_token}",
                 "Client-Id": constants.CLIENT_ID,
                 "Content-Type": "application/json",
             },
@@ -59,7 +60,7 @@ class TwitchEvent(abc.ABC):
         requests.delete(
             f"{constants.TWITCH_EVENTSUB}?id={self._id}",
             headers={
-                "Authorization": f"Bearer {constants.CREDENTIALS.access_token}",
+                "Authorization": f"Bearer {Credentials().access_token}",
                 "Client-Id": constants.CLIENT_ID,
             },
         )
@@ -67,14 +68,14 @@ class TwitchEvent(abc.ABC):
 
 class ChatReadEvent(TwitchEvent):
     def _register(self):
-        broadcaster_id = TwitchUtils.get_broadcaster_id(constants.BROADCASTER_NAME)
+        broadcaster_id = TwitchUtils.get_broadcaster_id(Config()["broadcaster_id"])
 
         return {
             "type": "channel.chat.message",
             "version": "1",
             "condition": {
                 "broadcaster_user_id": broadcaster_id,
-                "user_id": constants.TMP_USER_JOA,
+                "user_id": Config()["user_id"],
             },
         }
 

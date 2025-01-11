@@ -1,5 +1,4 @@
 import os
-from twitch.credentials import Credentials
 
 
 HTTP_PORT = 4150
@@ -18,8 +17,3 @@ SCOPE = "user:read:chat"
 
 COMBO_TIMEOUT = 5
 COMBO_THRESHOLD = 3
-
-CREDENTIALS = Credentials()
-
-BROADCASTER_NAME = "Name"  # TODO config
-TMP_USER_JOA = "544083108"

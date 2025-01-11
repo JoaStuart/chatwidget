@@ -1,5 +1,5 @@
 const msgList = document.getElementById("messages");
-const sock = new WebSocket("ws://localhost:4151/");
+const sock = new WebSocket("ws://localhost:{{WS_PORT}}/");
 
 const activeCombos = {};
 
@@ -44,7 +44,14 @@ const updateCombo = (msg) => {
 };
 
 const removeCombo = (msg) => {
-  msgList.removeChild(activeCombos[msg.data.text].rootEl);
+  activeCombos[msg.data.text].rootEl.animate(
+    { transform: "scale(0)" },
+    { duration: 200, fill: "forwards", easing: "ease-in" }
+  );
+
+  setTimeout(() => {
+    msgList.removeChild(activeCombos[msg.data.text].rootEl);
+  }, 200);
 };
 
 sock.addEventListener("message", (event) => {

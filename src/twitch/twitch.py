@@ -4,18 +4,25 @@ import websocket
 
 import constants
 from log import LOG
+from singleton import singleton
 from twitch.message import MessageTypes
 
 
+@singleton
 class TwitchConn:
     def __init__(self):
-        ws = websocket.WebSocketApp(
+        self._ws = websocket.WebSocketApp(
             constants.TWITCH_ENDPOINT,
             on_message=self._on_message,
             on_ping=self._on_ping,
             on_close=self._on_close,
         )
-        ws.run_forever()
+
+    def run(self) -> None:
+        self._ws.run_forever()
+
+    def stop(self) -> None:
+        self._ws.close()
 
     def _on_message(self, ws: websocket.WebSocket, message: str) -> None:
         json_data = json.loads(message)

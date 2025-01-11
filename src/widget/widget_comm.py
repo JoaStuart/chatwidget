@@ -1,8 +1,6 @@
-import asyncio
 import json
 import socket
 from threading import Thread
-import time
 from typing import Any
 from wsproto import WSConnection
 from wsproto.connection import ConnectionType
@@ -13,10 +11,12 @@ from wsproto.events import (
     Pong,
     Request,
     AcceptConnection,
+    Event,
 )
 
 import constants
 from log import LOG
+from widget.config import Config
 
 
 class CommServer:
@@ -25,10 +25,6 @@ class CommServer:
 
     @staticmethod
     def recv_thread() -> None:
-        asyncio.run(CommServer._recv_thread())
-
-    @staticmethod
-    async def _recv_thread() -> None:
         srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         srv.bind(("127.0.0.1", constants.HTTP_PORT + 1))
         srv.listen(1)
@@ -38,54 +34,20 @@ class CommServer:
 
         while True:
             sock, addr = srv.accept()
-            Thread(target=CommServer.handle, args=(sock, addr)).start()
 
-    @staticmethod
-    def send_thread() -> None:
-        while True:
-            time.sleep(0.1)
-            if len(CommServer.SEND_QUEUE) > 0:
-                data_msg = CommServer.SEND_QUEUE.pop(0)
+            conn = WSConnection(ConnectionType.SERVER)
+            obj = CommServer(conn, sock)
+            CommServer.CONNECTIONS.add(obj)
 
-                for connection in CommServer.CONNECTIONS:
-                    connection.send(data_msg)
+            Thread(
+                target=obj.handle, args=(addr,), name="CommsConnection", daemon=True
+            ).start()
 
     @staticmethod
     def broadcast(message: dict[str, Any]) -> None:
         data_msg = json.dumps(message)
-        CommServer.SEND_QUEUE.append(data_msg)
-
-    @staticmethod
-    def handle(sock: socket.socket, peername: tuple[str, int]) -> None:
-        LOG.info(f"New connection from {peername}")
-
-        conn = WSConnection(ConnectionType.SERVER)
-        obj = CommServer(conn, sock)
-        CommServer.CONNECTIONS.add(obj)
-
-        try:
-            while True:
-                data = sock.recv(4096)
-                if not data:
-                    break
-
-                conn.receive_data(data)
-
-                for event in conn.events():
-                    if isinstance(event, CloseConnection):
-                        LOG.info(f"Connection closed by {peername}")
-                        return
-                    elif isinstance(event, TextMessage):
-                        LOG.info(f"Received message from {peername}: {event.data}")
-                        # TODO write message to config
-                    elif isinstance(event, Ping):
-                        sock.sendall(conn.send(Pong(event.payload)))
-                    elif isinstance(event, Request):
-                        sock.sendall(conn.send(AcceptConnection()))
-        finally:
-            LOG.info(f"Cleaning up connection from {peername}")
-            CommServer.CONNECTIONS.remove(obj)
-            sock.close()
+        for connection in CommServer.CONNECTIONS:
+            connection.send(data_msg)
 
     def __init__(self, conn: WSConnection, sock: socket.socket):
         self._conn = conn
@@ -93,3 +55,58 @@ class CommServer:
 
     def send(self, message: str) -> None:
         self._sock.sendall(self._conn.send(TextMessage(message)))
+
+    def handle(self, peername: tuple[str, int]) -> None:
+        LOG.info(f"WebSocket incoming from {peername}")
+
+        try:
+            self._read(peername)
+        finally:
+            LOG.info(f"WebSocket cleanup for {peername}")
+            CommServer.CONNECTIONS.remove(self)
+            self._sock.close()
+
+    def _read(self, peername: tuple[str, int]) -> None:
+        while True:
+            data = self._sock.recv(4096)
+            if not data:
+                break
+
+            self._conn.receive_data(data)
+
+            for event in self._conn.events():
+                if isinstance(event, CloseConnection):
+                    LOG.info(f"Connection closed by {peername}")
+                    return
+
+                elif isinstance(event, TextMessage):
+                    self._recv_msg(event)
+
+                elif isinstance(event, Ping):
+                    self._send_event(Pong(event.payload))
+
+                elif isinstance(event, Request):
+                    self._send_event(
+                        AcceptConnection(),
+                        TextMessage(
+                            json.dumps({"event": "config", "data": Config().dump()})
+                        ),
+                    )
+
+    def _recv_msg(self, evt: TextMessage) -> None:
+        try:
+            data = json.loads(evt.data)
+            event = data["event"]
+
+            if event == "config_set":
+                key = data["data"]["key"]
+                val = data["data"]["value"]
+                Config()[key] = val
+
+        except Exception:
+            pass
+
+    def _send_event(self, *event: Event) -> None:
+        for e in event:
+            data = self._conn.send(e)
+            self._sock.sendall(data)

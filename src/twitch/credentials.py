@@ -1,6 +1,9 @@
 from typing import Optional
 
+from singleton import singleton
 
+
+@singleton
 class Credentials:
     def __init__(self):
         self._access_token: Optional[str] = None

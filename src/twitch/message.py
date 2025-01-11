@@ -2,8 +2,8 @@ import abc
 from enum import Enum
 from typing import Any, Type
 
-import constants
 from log import LOG
+from twitch.credentials import Credentials
 from twitch.events import EventTypes
 
 
@@ -25,7 +25,7 @@ class TwitchMessageWelcome(TwitchMessage):
         return "session_welcome"
 
     def handle(self):
-        constants.CREDENTIALS.session_id = self._data["payload"]["session"]["id"]
+        Credentials().session_id = self._data["payload"]["session"]["id"]
 
         EventTypes.register_all()
 

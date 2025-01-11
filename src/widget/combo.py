@@ -1,18 +1,8 @@
 import time
 
 import constants
+from singleton import singleton
 from widget.widget_comm import CommServer
-
-
-def singleton(cls):
-    instances = {}
-
-    def get_instance(*args, **kwargs):
-        if cls not in instances:
-            instances[cls] = cls(*args, **kwargs)
-        return instances[cls]
-
-    return get_instance
 
 
 @singleton
