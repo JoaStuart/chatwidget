@@ -2,6 +2,7 @@ import time
 
 import constants
 from singleton import singleton
+from twitch.credentials import Credentials
 from widget.widget_comm import CommServer
 
 
@@ -20,7 +21,7 @@ class ComboManager:
         found = False
 
         for c in self._combos:
-            if c.text.lower() in message.lower():
+            if c.text in message.upper():
                 c.add_entry()
                 found = True
 
@@ -39,7 +40,7 @@ class ComboManager:
 
 class ChatCombo:
     def __init__(self, text: str):
-        self._text = text
+        self._text = text.upper()
         self._entries = 1
         self._expires = self._make_expiry()
 
@@ -60,6 +61,11 @@ class ChatCombo:
         self._update_combo()
 
     def _create_combo(self) -> None:
+        if Credentials().emote_manager is not None:
+            emote_string = Credentials().emote_manager.make_emote_string(self.text)
+        else:
+            emote_string = [{"type": "text", "value": self.text}]
+
         CommServer.broadcast(
             {
                 "event": "combo_create",
@@ -67,6 +73,7 @@ class ChatCombo:
                     "type": "text",
                     "text": self.text,
                     "combo": self.entries,
+                    "emote": emote_string,
                 },
             }
         )

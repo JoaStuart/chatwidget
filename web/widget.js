@@ -14,12 +14,34 @@ const bounce = (el) => {
   );
 };
 
+const createEmoteString = (emoteStr, emoteEl) => {
+  for (const part of emoteStr) {
+    if (part.type === "text") {
+      const el = document.createElement("span");
+
+      el.innerText = part.value;
+      el.classList.add("textpart");
+
+      emoteEl.appendChild(el);
+    } else if (part.type === "emote") {
+      const el = document.createElement("img");
+
+      el.src = part.value;
+      el.alt = part.text;
+      el.classList.add("textpart");
+
+      emoteEl.appendChild(el);
+    }
+  }
+};
+
 const createCombo = (msg) => {
   const el = document.createElement("div");
-  const text = document.createElement("span");
+  const text = document.createElement("div");
   const combo = document.createElement("span");
 
-  text.innerText = msg.data.text;
+  createEmoteString(msg.data.emote, text);
+  el.dataset["text"] = msg.data.text;
   combo.innerText = `x${msg.data.combo}`;
 
   text.classList.add("text");

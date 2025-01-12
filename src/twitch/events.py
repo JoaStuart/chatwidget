@@ -1,5 +1,6 @@
 import abc
 from enum import Enum
+from threading import Thread
 from typing import Any, Optional
 
 import requests
@@ -7,6 +8,7 @@ import requests
 from log import LOG
 import constants
 from twitch.credentials import Credentials
+from twitch.emotes.emotes import EmoteManager
 from twitch.utils import TwitchUtils
 from widget.combo import ComboManager
 from widget.config import Config
@@ -67,8 +69,18 @@ class TwitchEvent(abc.ABC):
 
 
 class ChatReadEvent(TwitchEvent):
+    def _create_emote_manager(self, broadcaster_id: str) -> None:
+        Credentials().emote_manager = EmoteManager(broadcaster_id)
+
     def _register(self):
         broadcaster_id = TwitchUtils.get_broadcaster_id(Config()["broadcaster_id"])
+
+        Thread(
+            target=self._create_emote_manager,
+            args=(broadcaster_id,),
+            name="EmoteLoader",
+            daemon=True,
+        ).start()
 
         return {
             "type": "channel.chat.message",

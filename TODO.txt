@@ -1,0 +1,8 @@
+TODO:
+- Implement FrankerFaceZ: https://api.frankerfacez.com/docs/
+- Better combo comparison (not only check if includes)
+- OBS locking server websocket
+- Parse message using Twitch's fragments because of other channel's emotes
+- Put more things into config
+- Rename credentials class?
+- OBS styled dashboard
