@@ -38,6 +38,7 @@ class EmoteManager(abc.ABC):
         from twitch.emotes.seventv import SevenTVChannel, SevenTVGlobal
         from twitch.emotes.betterttv import BetterTTVGlobal
         from twitch.emotes.twitch import TwitchTVChannel, TwitchTVGlobal
+        from twitch.emotes.frankerfacez import FrankerFaceZChannel
 
         return [
             # Global emotes
@@ -46,6 +47,7 @@ class EmoteManager(abc.ABC):
             TwitchTVGlobal,
             # Channel emotes
             SevenTVChannel,
+            FrankerFaceZChannel,
             TwitchTVChannel,
         ]
 
