@@ -22,7 +22,7 @@ class TwitchConn:
         self._ws.run_forever()
 
     def stop(self) -> None:
-        self._ws.close()
+        self._ws.close(status=1000, reason="Closing connection.")
 
     def _on_message(self, ws: websocket.WebSocket, message: str) -> None:
         json_data = json.loads(message)

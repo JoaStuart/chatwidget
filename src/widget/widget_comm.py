@@ -49,9 +49,15 @@ class CommServer:
         for connection in CommServer.CONNECTIONS:
             connection.send(data_msg)
 
+    @staticmethod
+    def close_all() -> None:
+        for connection in CommServer.CONNECTIONS:
+            connection.close()
+
     def __init__(self, conn: WSConnection, sock: socket.socket):
         self._conn = conn
         self._sock = sock
+        self._closing: bool = False
 
     def send(self, message: str) -> None:
         self._sock.sendall(self._conn.send(TextMessage(message)))
@@ -60,13 +66,17 @@ class CommServer:
         LOG.info(f"WebSocket incoming from {peername}")
 
         try:
-            self._read(peername)
+            self._read()
         finally:
-            LOG.info(f"WebSocket cleanup for {peername}")
+            LOG.info(f"WebSocket closed for {peername}")
             CommServer.CONNECTIONS.remove(self)
             self._sock.close()
 
-    def _read(self, peername: tuple[str, int]) -> None:
+    def close(self) -> None:
+        self._send_event(CloseConnection(1000, "Closing connection."))
+        self._closing = True
+
+    def _read(self) -> None:
         while True:
             data = self._sock.recv(4096)
             if not data:
@@ -76,7 +86,9 @@ class CommServer:
 
             for event in self._conn.events():
                 if isinstance(event, CloseConnection):
-                    LOG.info(f"Connection closed by {peername}")
+                    if not self._closing:
+                        self._send_event(CloseConnection(event.code, event.reason))
+                    self._sock.close()
                     return
 
                 elif isinstance(event, TextMessage):

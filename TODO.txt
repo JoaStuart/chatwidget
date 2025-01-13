@@ -1,5 +1,4 @@
 TODO:
-- OBS locking server websocket
 - Parse message using Twitch's fragments because of other channel's emotes
 - Put more things into config
 - Rename credentials class?

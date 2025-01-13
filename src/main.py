@@ -29,9 +29,12 @@ MOCK_MESSAGES = [
 try:
     while True:
         sleep(0.5)
-        ComboManager().read(random.choice(MOCK_MESSAGES))
+        # ComboManager().read(random.choice(MOCK_MESSAGES))
 except KeyboardInterrupt:
     LOG.info("Shutting down...")
 
 EventTypes.delete_all()
 TwitchConn().stop()
+CommServer.close_all()
+
+exit(0)
