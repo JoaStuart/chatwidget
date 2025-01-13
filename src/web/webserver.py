@@ -1,4 +1,4 @@
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 import mimetypes
 import os
 from threading import Thread
@@ -13,7 +13,9 @@ from twitch.twitch import TwitchConn
 class HTTPHandler(BaseHTTPRequestHandler):
     @staticmethod
     def start_server() -> None:
-        with HTTPServer(("localhost", constants.HTTP_PORT), HTTPHandler) as httpd:
+        with ThreadingHTTPServer(
+            ("localhost", constants.HTTP_PORT), HTTPHandler
+        ) as httpd:
             LOG.info(f"Serving on http://localhost:{constants.HTTP_PORT}")
             httpd.serve_forever()
 
@@ -56,13 +58,6 @@ class HTTPHandler(BaseHTTPRequestHandler):
             )
             return
 
-        self.send_response(200, "OK")
-        self.send_header(
-            "Content-Type",
-            mimetypes.guess_type(page_name)[0] or constants.FALLBACK_MIME,
-        )
-        self.end_headers()
-
         with open(path, "rb") as rf:
             data = rf.read()
 
@@ -74,6 +69,14 @@ class HTTPHandler(BaseHTTPRequestHandler):
                 replace = replace.encode()
 
             data = data.replace(key, replace)
+
+        self.send_response(200, "OK")
+        self.send_header(
+            "Content-Type",
+            mimetypes.guess_type(page_name)[0] or constants.FALLBACK_MIME,
+        )
+        self.send_header("Content-Length", str(len(data)))
+        self.end_headers()
 
         self.wfile.write(data)
 
@@ -124,8 +127,8 @@ class HTTPHandler(BaseHTTPRequestHandler):
                 )
             case "/widget.css":
                 self._send_page("widget.css")
-            case "/tiny5.ttf":
-                self._send_page("tiny5/Tiny5.ttf")
+            case "/PasseroOne.ttf":
+                self._send_page("passero_one/PasseroOne.ttf")
 
             case "/dashboard":
                 self._send_page("dashboard.html")

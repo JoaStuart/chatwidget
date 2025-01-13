@@ -63,5 +63,7 @@ SEVENTV_GLOBAL = (
 
 BETTERTTV_EMOTES = "https://api.betterttv.net/3/cached/emotes/global"
 
+FRANKERFACEZ_ROOM = "https://api.frankerfacez.com/v1/room/id"
+
 COMBO_TIMEOUT = 5
 COMBO_THRESHOLD = 3
