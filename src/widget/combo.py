@@ -1,4 +1,6 @@
+import re
 import time
+from typing import Optional
 
 import constants
 from singleton import singleton
@@ -21,7 +23,7 @@ class ComboManager:
         found = False
 
         for c in self._combos:
-            if c.text in message.upper():
+            if c.compare(message):
                 c.add_entry()
                 found = True
 
@@ -40,12 +42,25 @@ class ComboManager:
 
 class ChatCombo:
     def __init__(self, text: str):
-        self._text = text.upper()
+        self._text = text
         self._entries = 1
         self._expires = self._make_expiry()
 
     def _make_expiry(self) -> float:
         return time.time() + constants.COMBO_TIMEOUT
+
+    def compare(self, message: str) -> bool:
+        if " " in message:
+            removal = [".", ",", "!", "?", ":"]
+            c_str = self.text
+            m_str = message
+            for c in removal:
+                c_str = c_str.replace(c, "")
+                m_str = m_str.replace(c, "")
+
+            return c_str.lower() == m_str.lower()
+        else:
+            return self.text.lower() == message.lower()
 
     def add_entry(self) -> None:
         self._entries += 1

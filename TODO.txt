@@ -1,8 +1,9 @@
 TODO:
-- Implement FrankerFaceZ: https://api.frankerfacez.com/docs/
-- Better combo comparison (not only check if includes)
 - OBS locking server websocket
 - Parse message using Twitch's fragments because of other channel's emotes
 - Put more things into config
 - Rename credentials class?
 - OBS styled dashboard
+- BetterTTV Channel emote
+- Make JS not throw thousands of errors when combo is not found
+- Reconnect JS automatically / show user that it is disconnected

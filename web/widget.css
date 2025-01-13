@@ -1,6 +1,6 @@
 @font-face {
-  font-family: "Tiny5";
-  src: url("/tiny5.ttf");
+  font-family: "PasseroOne";
+  src: url("/PasseroOne.ttf");
 }
 
 body {
@@ -8,14 +8,14 @@ body {
   height: 100vh;
   overflow: hidden;
 
-  font-family: "Tiny5", sans-serif;
+  font-family: "PasseroOne", sans-serif;
   background-color: rgba(0, 0, 0, 0);
   color: white;
 
   --outline-thin: 1.5px 0px 0 black, -1.5px 0px 0 black, 0px 1.5px 0 black,
     0px -1.5px 0 black;
-  --outline-thick: 2px 0px 0 black, -2px 0px 0 black, 0px 2px 0 black,
-    0px -2px 0 black;
+  --outline-thick: 3px 0px 0 black, -3px 0px 0 black, 0px 3px 0 black,
+    0px -3px 0 black;
 }
 
 #messages {
@@ -28,10 +28,10 @@ body {
 }
 
 #messages .textpart {
-  font-size: 30px;
+  font-size: 40px;
   --outline-thickness: 6px;
   text-shadow: var(--outline-thick);
-  height: 45px;
+  height: 60px;
 }
 
 #messages span.combo {
