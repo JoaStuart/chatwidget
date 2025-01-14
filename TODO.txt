@@ -4,5 +4,3 @@ TODO:
 - Rename credentials class?
 - OBS styled dashboard
 - BetterTTV Channel emote
-- Make JS not throw thousands of errors when combo is not found
-- Reconnect JS automatically / show user that it is disconnected

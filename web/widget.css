@@ -12,8 +12,8 @@ body {
   background-color: rgba(0, 0, 0, 0);
   color: white;
 
-  --outline-thin: 1.5px 0px 0 black, -1.5px 0px 0 black, 0px 1.5px 0 black,
-    0px -1.5px 0 black;
+  --outline-thin: 2px 0px 0 black, -2px 0px 0 black, 0px 2px 0 black,
+    0px -2px 0 black;
   --outline-thick: 3px 0px 0 black, -3px 0px 0 black, 0px 3px 0 black,
     0px -3px 0 black;
 }
@@ -32,10 +32,11 @@ body {
   --outline-thickness: 6px;
   text-shadow: var(--outline-thick);
   height: 60px;
+  color: #ffff00;
 }
 
 #messages span.combo {
-  font-size: 25px;
+  font-size: 30px;
   --outline-thickness: 3px;
   text-shadow: var(--outline-thin);
 }
@@ -45,4 +46,57 @@ body {
   flex-direction: row;
   gap: 20px;
   align-items: baseline;
+}
+
+#notification {
+  position: absolute;
+  left: 0;
+  top: 20px;
+
+  height: calc(100% - 40px);
+  width: 50px;
+  background-color: gray;
+  border-radius: 0px 20px 20px 0px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+
+  transform: translateX(-50px);
+}
+
+#notification .orange {
+  position: absolute;
+  left: 0;
+  top: 0;
+  content: "";
+
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(orange 30%, transparent 50%, orange 70%);
+  border-radius: 0px 20px 20px 0px;
+  z-index: -5;
+  background-size: 500% 500%;
+  background-position: 0 0%;
+
+  animation: wave 4s infinite;
+}
+
+#notification .msg {
+  color: black;
+  transform: rotate(90deg);
+  display: block;
+  font-size: 30px;
+  width: max-content;
+}
+
+@keyframes wave {
+  0% {
+    background-position: 0 0%;
+  }
+  100% {
+    background-position: 0 100%;
+  }
 }

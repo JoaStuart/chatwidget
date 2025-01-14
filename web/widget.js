@@ -1,5 +1,5 @@
 const msgList = document.getElementById("messages");
-const sock = new WebSocket("ws://localhost:{{WS_PORT}}/");
+const notification = document.getElementById("notification");
 
 const activeCombos = {};
 
@@ -10,7 +10,7 @@ const bounce = (el) => {
       { transform: "scale(1.2)" },
       { transform: "scale(1)" },
     ],
-    { duration: 200, easing: "ease-out" }
+    { duration: 200, easing: "ease" }
   );
 };
 
@@ -60,26 +60,61 @@ const createCombo = (msg) => {
 };
 
 const updateCombo = (msg) => {
-  activeCombos[msg.data.text].comboEl.innerText = `x${msg.data.combo}`;
+  const combo = activeCombos[msg.data.text];
+  if (combo === undefined) return;
 
-  bounce(activeCombos[msg.data.text].rootEl);
+  combo.comboEl.innerText = `x${msg.data.combo}`;
+
+  bounce(combo.rootEl);
 };
 
 const removeCombo = (msg) => {
-  activeCombos[msg.data.text].rootEl.animate(
+  const combo = activeCombos[msg.data.text];
+  if (combo === undefined) return;
+
+  combo.rootEl.animate(
     { transform: "scale(0)" },
     { duration: 200, fill: "forwards", easing: "ease-in" }
   );
 
-  setTimeout(() => {
-    msgList.removeChild(activeCombos[msg.data.text].rootEl);
-  }, 200);
+  setTimeout(() => msgList.removeChild(combo.rootEl), 200);
+
+  delete activeCombos[msg.data.text];
 };
 
-sock.addEventListener("message", (event) => {
-  const msg = JSON.parse(event.data);
+const reloadTest = () => {
+  fetch("/")
+    .then(() => {
+      sock = connect();
+    })
+    .catch(() => setTimeout(reloadTest, 1000));
+};
 
-  if (msg.event === "combo_create") createCombo(msg);
-  else if (msg.event === "combo_update") updateCombo(msg);
-  else if (msg.event === "combo_remove") removeCombo(msg);
-});
+const connect = () => {
+  const s = new WebSocket("ws://localhost:{{WS_PORT}}/");
+  s.addEventListener("message", (event) => {
+    const msg = JSON.parse(event.data);
+
+    if (msg.event === "combo_create") createCombo(msg);
+    else if (msg.event === "combo_update") updateCombo(msg);
+    else if (msg.event === "combo_remove") removeCombo(msg);
+  });
+
+  s.addEventListener("close", () => {
+    notification.animate(
+      { transform: "translateX(0px)" },
+      { duration: 400, fill: "forwards" }
+    );
+    reloadTest();
+  });
+
+  s.addEventListener("open", () => {
+    notification.animate(
+      { transform: "translateX(-50px)" },
+      { duration: 400, fill: "forwards" }
+    );
+  });
+
+  return s;
+};
+let sock = connect();
