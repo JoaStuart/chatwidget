@@ -5,6 +5,7 @@ from typing import Any, Type
 from log import LOG
 from twitch.credentials import Credentials
 from twitch.events import EventTypes
+from twitch.twitch import TwitchConn
 
 
 class TwitchMessage(abc.ABC):
@@ -35,7 +36,7 @@ class TwitchMessageKeepAlive(TwitchMessage):
         return "session_keepalive"
 
     def handle(self):
-        return
+        return  # At this point we dont care about keepalive messages yet
 
 
 class TwitchMessageNotification(TwitchMessage):
@@ -49,10 +50,32 @@ class TwitchMessageNotification(TwitchMessage):
         EventTypes.trigger(subscription_id, payload["event"])
 
 
+class TwitchMessageReconnect(TwitchMessage):
+    def message_id(self):
+        return "session_reconnect"
+
+    def handle(self):
+        reconnect_url = self._data["payload"]["session"]["reconnect_url"]
+
+        TwitchConn().reconnect(reconnect_url)
+
+
+class TwitchMessageRevocation(TwitchMessage):
+    def message_id(self):
+        return "revocation"
+
+    def handle(self):
+        LOG.warning("The user has revoked the permissions!")
+
+        TwitchConn().stop()
+
+
 class MessageTypes(Enum):
     MESSAGE_WELCOME = TwitchMessageWelcome
     MESSAGE_KEEP_ALIVE = TwitchMessageKeepAlive
     MESSAGE_NOTIFICATION = TwitchMessageNotification
+    MESSAGE_RECONNECT = TwitchMessageReconnect
+    MESSAGE_REVOCATION = TwitchMessageRevocation
 
     def __init__(self, msg_cls: Type[TwitchMessage]):
         self._msg_cls = msg_cls

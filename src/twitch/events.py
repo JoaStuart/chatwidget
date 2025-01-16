@@ -74,6 +74,7 @@ class ChatReadEvent(TwitchEvent):
 
     def _register(self):
         broadcaster_id = TwitchUtils.get_broadcaster_id(Config()["broadcaster_id"])
+        user_id = TwitchUtils.get_broadcaster_id(Config()["user_id"])
 
         Thread(
             target=self._create_emote_manager,
@@ -87,7 +88,7 @@ class ChatReadEvent(TwitchEvent):
             "version": "1",
             "condition": {
                 "broadcaster_user_id": broadcaster_id,
-                "user_id": Config()["user_id"],
+                "user_id": user_id or broadcaster_id,
             },
         }
 

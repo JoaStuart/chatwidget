@@ -1,5 +1,5 @@
 import abc
-from typing import Any, Type
+from typing import Type
 
 
 class Emote:
@@ -75,20 +75,6 @@ class EmoteManager(abc.ABC):
         text_buffer.clear()
 
     def make_emote_string(self, text: str) -> list[dict[str, str]]:
-        """
-        [
-            {
-                "type": "text",
-                "value": "Hello"
-            },
-            {
-                "type": "emote",
-                "text": "TwitchUnity",
-                "value": "https://static-cdn.jtvnw.net/emoticons/v2/196892/static/light/2.0",
-            }
-        ]
-        """
-
         emote_string = []
 
         text_buffer = []

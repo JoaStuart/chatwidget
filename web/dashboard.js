@@ -1,5 +1,10 @@
 const sock = new WebSocket("ws://localhost:{{WS_PORT}}/");
 const form = document.getElementById("config");
+const connect = document.getElementById("connect");
+const diffUser = document.getElementById("different_user");
+const diffUserInp = document.getElementById("user_id");
+const descriptionBox = document.getElementById("description");
+let descriptionShown = true;
 const config = {};
 
 sock.addEventListener("message", (ev) => {
@@ -17,6 +22,9 @@ sock.addEventListener("message", (ev) => {
   } else if (msg.event === "config_change") {
     document.getElementById(msg.data.key).value = msg.data.value;
     config[msg.data.key] = msg.data.value;
+  } else if (msg.event === "connect") {
+    const connected = msg.data.connected;
+    connect.disabled = connected;
   }
 });
 
@@ -33,7 +41,6 @@ const sendChange = (key, val) => {
 };
 
 form.addEventListener("submit", (ev) => {
-  console.log("Submitted");
   ev.preventDefault();
 
   for (const key of Object.keys(config)) {
@@ -45,3 +52,13 @@ form.addEventListener("submit", (ev) => {
     }
   }
 });
+
+diffUser.addEventListener("change", (ev) => {
+  diffUserInp.disabled = !ev.target.checked;
+});
+
+for (const descripted of document.getElementsByClassName("description")) {
+  descripted.addEventListener("mouseover", () => {
+    descriptionBox.innerText = descripted.dataset.desc;
+  });
+}

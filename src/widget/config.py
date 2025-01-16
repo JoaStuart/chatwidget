@@ -1,7 +1,9 @@
 import json
 import os
 from typing import Any
+
 import constants
+from log import LOG
 from singleton import singleton
 
 
@@ -21,6 +23,12 @@ class Config:
             wf.write(json.dumps(self._config, indent=2))
 
     def __setitem__(self, key: str, val: Any) -> None:
+        default = self._config[key]["default"]
+        if isinstance(default, float):
+            val = float(val)
+        elif isinstance(default, int):
+            val = int(val)
+
         self._config[key]["current"] = val
         from widget.widget_comm import CommServer
 

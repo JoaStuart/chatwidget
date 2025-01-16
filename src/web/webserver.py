@@ -1,13 +1,13 @@
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 import mimetypes
 import os
-from threading import Thread
 from urllib.parse import quote
 
 import constants
 from log import LOG
 from twitch.credentials import Credentials
 from twitch.twitch import TwitchConn
+from widget.widget_comm import CommServer
 
 
 class HTTPHandler(BaseHTTPRequestHandler):
@@ -99,45 +99,58 @@ class HTTPHandler(BaseHTTPRequestHandler):
 
         Credentials().access_token = access_token
 
-        Thread(target=TwitchConn().run, daemon=True).start()
-        # TODO: Send out event for control panel
+        TwitchConn().run()
+        CommServer.broadcast(
+            {
+                "event": "connect",
+                "data": {"connected": True},
+            }
+        )
 
         self._send_page("authorized.html")
 
     def do_GET(self):
         path, params = self._split_path()
 
+        PAGES: dict[str, tuple[str] | tuple[str, dict[str | bytes, str | bytes]]] = {
+            "/": (
+                "index.html",
+                {
+                    "{{CLIENT_ID}}": quote(constants.CLIENT_ID),
+                    "{{REDIRECT_URI}}": quote(constants.AUTH_REDIR),
+                    "{{SCOPE}}": quote(constants.SCOPE),
+                },
+            ),
+            "/widget": ("widget.html",),
+            "/widget.js": ("widget.js", {"{{WS_PORT}}": str(constants.HTTP_PORT + 1)}),
+            "/widget.css": ("widget.css",),
+            "/PasseroOne.ttf": ("passero_one/PasseroOne.ttf",),
+            "/dashboard": (
+                "dashboard.html",
+                {
+                    "{{CLIENT_ID}}": quote(constants.CLIENT_ID),
+                    "{{REDIRECT_URI}}": quote(constants.AUTH_REDIR),
+                    "{{SCOPE}}": quote(constants.SCOPE),
+                },
+            ),
+            "/dashboard.js": (
+                "dashboard.js",
+                {"{{WS_PORT}}": str(constants.HTTP_PORT + 1)},
+            ),
+            "/dashboard.css": ("dashboard.css",),
+        }
+
         match path:
-            case "/":
-                self._send_page(
-                    "index.html",
-                    {
-                        "{{CLIENT_ID}}": quote(constants.CLIENT_ID),
-                        "{{REDIRECT_URI}}": quote(constants.AUTH_REDIR),
-                        "{{SCOPE}}": quote(constants.SCOPE),
-                    },
-                )
             case "/authorized":
                 self._authorized(params)
-            case "/widget":
-                self._send_page("widget.html")
-            case "/widget.js":
-                self._send_page(
-                    "widget.js", {"{{WS_PORT}}": str(constants.HTTP_PORT + 1)}
-                )
-            case "/widget.css":
-                self._send_page("widget.css")
-            case "/PasseroOne.ttf":
-                self._send_page("passero_one/PasseroOne.ttf")
-
-            case "/dashboard":
-                self._send_page("dashboard.html")
-            case "/dashboard.js":
-                self._send_page(
-                    "dashboard.js", {"{{WS_PORT}}": str(constants.HTTP_PORT + 1)}
-                )
-            case "/dashboard.css":
-                self._send_page("dashboard.css")
 
             case _:
-                self.send_error(404, "Not Found", "This page could not be found! :(")
+                page = PAGES.get(path, None)
+
+                if page is None:
+                    self.send_error(
+                        404, "Not Found", "This page could not be found! :("
+                    )
+                    return
+
+                self._send_page(*page)

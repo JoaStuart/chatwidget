@@ -16,6 +16,7 @@ from wsproto.events import (
 
 import constants
 from log import LOG
+from twitch.twitch import TwitchConn
 from widget.config import Config
 
 
@@ -102,6 +103,14 @@ class CommServer:
                         AcceptConnection(),
                         TextMessage(
                             json.dumps({"event": "config", "data": Config().dump()})
+                        ),
+                        TextMessage(
+                            json.dumps(
+                                {
+                                    "event": "connect",
+                                    "data": {"connected": TwitchConn().connected},
+                                }
+                            )
                         ),
                     )
 

@@ -1,10 +1,9 @@
 import re
 import time
-from typing import Optional
 
-import constants
 from singleton import singleton
 from twitch.credentials import Credentials
+from widget.config import Config
 from widget.widget_comm import CommServer
 
 
@@ -41,13 +40,16 @@ class ComboManager:
 
 
 class ChatCombo:
+    ACTIVE_COMBOS = 0
+
     def __init__(self, text: str):
         self._text = text
         self._entries = 1
         self._expires = self._make_expiry()
+        self._active = False
 
     def _make_expiry(self) -> float:
-        return time.time() + constants.COMBO_TIMEOUT
+        return time.time() + Config()["combo_timeout"]
 
     def compare(self, message: str) -> bool:
         if " " in message:
@@ -66,14 +68,19 @@ class ChatCombo:
         self._entries += 1
         self._expires = self._make_expiry()
 
-        if self._entries < constants.COMBO_THRESHOLD:
+        if self._entries < Config()["combo_threshold"]:
             return
 
-        if self._entries == constants.COMBO_THRESHOLD:
+        if self._active:
+            self._update_combo()
+        else:
+            self._activate()
+
+    def _activate(self) -> None:
+        if self.ACTIVE_COMBOS < Config()["max_combo"]:
+            self._active = True
             self._create_combo()
-            return
-
-        self._update_combo()
+            self.ACTIVE_COMBOS += 1
 
     def _create_combo(self) -> None:
         if Credentials().emote_manager is not None:
@@ -105,7 +112,7 @@ class ChatCombo:
         )
 
     def remove_combo(self) -> None:
-        if self.entries < constants.COMBO_THRESHOLD:
+        if not self._active:
             return
 
         CommServer.broadcast(
