@@ -3,6 +3,10 @@
     "default": "",
     "current": "insym"
   },
+  "different_user": {
+    "default": false,
+    "current": true
+  },
   "user_id": {
     "default": "",
     "current": "joajdx"

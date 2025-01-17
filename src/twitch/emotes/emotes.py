@@ -1,5 +1,7 @@
 import abc
-from typing import Type
+from typing import Any, Type
+
+import constants
 
 
 class Emote:
@@ -37,18 +39,15 @@ class EmoteManager(abc.ABC):
     def platforms() -> "list[Type[EmotePlatform]]":
         from twitch.emotes.seventv import SevenTVChannel, SevenTVGlobal
         from twitch.emotes.betterttv import BetterTTVGlobal
-        from twitch.emotes.twitch import TwitchTVChannel, TwitchTVGlobal
         from twitch.emotes.frankerfacez import FrankerFaceZChannel
 
         return [
             # Global emotes
             SevenTVGlobal,
             BetterTTVGlobal,
-            TwitchTVGlobal,
             # Channel emotes
             SevenTVChannel,
             FrankerFaceZChannel,
-            TwitchTVChannel,
         ]
 
     def __init__(self, channel_id: str):
@@ -74,7 +73,53 @@ class EmoteManager(abc.ABC):
         )
         text_buffer.clear()
 
-    def make_emote_string(self, text: str) -> list[dict[str, str]]:
+    def make_emote_string(
+        self, fragments: list[dict[str, Any]]
+    ) -> list[dict[str, str]]:
+        """Generates an emote string from the fragments twitch provided us
+
+        Args:
+            fragments (list[dict[str, Any]]): The fragments from Twitch
+
+        Returns:
+            list[dict[str, str]]: The emote string to send to the widget
+        """
+
+        emote_string = []
+
+        for f in fragments:
+            if f["type"] != "emote":
+                emote_string.append(self._emote_str_part(f["text"]))
+                continue
+
+            emote_id = f["emote"]["id"]
+
+            link = (
+                constants.TWITCH_EMOTE_CDN.replace("{{ID}}", emote_id)
+                .replace("{{FORMAT}}", "default")
+                .replace("{{SCHEME}}", "light")
+                .replace("{{SIZE}}", "3.0")
+            )
+            emote_string.append(
+                {
+                    "type": "emote",
+                    "text": f["text"],
+                    "value": link,
+                }
+            )
+
+        return emote_string
+
+    def _emote_str_part(self, text: str) -> list[dict[str, str]]:
+        """Generates an emote string from a text sequence
+
+        Args:
+            text (str): The text sequence potentially containing 3rd party emotes
+
+        Returns:
+            list[dict[str, str]]: The emote string constructed from the input text
+        """
+
         emote_string = []
 
         text_buffer = []

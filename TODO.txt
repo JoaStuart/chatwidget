@@ -1,6 +1,8 @@
 TODO:
-- Parse message using Twitch's fragments because of other channel's emotes
-- Put more things into config
 - Rename credentials class?
-- OBS styled dashboard
 - BetterTTV Channel emote
+- Design for the `authorized.html`
+- Make the main thread also do something?
+- Reset config values
+- Stopping server through dashboard?
+- Comments!
