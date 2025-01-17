@@ -5,6 +5,12 @@ from twitch.emotes.emotes import Emote, EmotePlatform
 
 class BetterTTVGlobal(EmotePlatform):
     def load_emotes(self):
+        """Loads all global emotes from BetterTTV
+
+        Returns:
+            dict[str, Emote]: The emotes that were loaded
+        """
+
         resp = requests.get(constants.BETTERTTV_EMOTES)
         resp.raise_for_status()
 

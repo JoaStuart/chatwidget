@@ -3,6 +3,10 @@ const notification = document.getElementById("notification");
 
 const activeCombos = {};
 
+/**
+ * Plays a bounce animation on the element
+ * @param {Element} el
+ */
 const bounce = (el) => {
   el.animate(
     [
@@ -14,6 +18,11 @@ const bounce = (el) => {
   );
 };
 
+/**
+ * Converts an emote string into elements
+ * @param {{}} emoteStr
+ * @param {Element} emoteEl
+ */
 const createEmoteString = (emoteStr, emoteEl) => {
   for (const part of emoteStr) {
     if (part.type === "text") {
@@ -35,6 +44,10 @@ const createEmoteString = (emoteStr, emoteEl) => {
   }
 };
 
+/**
+ * Creates a combo for the given message
+ * @param {string} msg The message
+ */
 const createCombo = (msg) => {
   const el = document.createElement("div");
   const text = document.createElement("div");
@@ -59,6 +72,10 @@ const createCombo = (msg) => {
   bounce(el);
 };
 
+/**
+ * Updates the count of a combo
+ * @param {string} msg The message to update
+ */
 const updateCombo = (msg) => {
   const combo = activeCombos[msg.data.text];
   if (combo === undefined) return;
@@ -68,6 +85,10 @@ const updateCombo = (msg) => {
   bounce(combo.rootEl);
 };
 
+/**
+ * Removes a combo message
+ * @param {string} msg The message to remove
+ */
 const removeCombo = (msg) => {
   const combo = activeCombos[msg.data.text];
   if (combo === undefined) return;
@@ -82,6 +103,9 @@ const removeCombo = (msg) => {
   delete activeCombos[msg.data.text];
 };
 
+/**
+ * Tests if the backend is up again
+ */
 const reloadTest = () => {
   fetch("/")
     .then(() => {
@@ -90,6 +114,10 @@ const reloadTest = () => {
     .catch(() => setTimeout(reloadTest, 1000));
 };
 
+/**
+ * Establishes a WebSocket connection to the backend
+ * @returns The connected WebSocket
+ */
 const connect = () => {
   const s = new WebSocket("ws://localhost:{{WS_PORT}}/");
   s.addEventListener("message", (event) => {
@@ -117,4 +145,5 @@ const connect = () => {
 
   return s;
 };
+
 let sock = connect();

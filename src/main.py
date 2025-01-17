@@ -13,26 +13,20 @@ if __name__ != "__main__":
     print("Try executing this file directly!")
     exit(-1)
 
+# Start services in background threads
 Thread(target=HTTPHandler.start_server, name="WebServer", daemon=True).start()
 Thread(target=ComboManager().combo_thread, name="ComboManager", daemon=True).start()
 Thread(target=CommServer.recv_thread, name="CommsManager", daemon=True).start()
 
 
-MOCK_MESSAGES = [
-    "Hi",
-    "catJAM",
-    "KEKW",
-    "lul",
-    "Kappa",
-]
-
+# Wait until the user presses ^C
 try:
     while True:
-        sleep(0.5)
-        # ComboManager().read(random.choice(MOCK_MESSAGES))
+        sleep(10)
 except KeyboardInterrupt:
     LOG.info("Shutting down...")
 
+# Shut down all services
 EventTypes.delete_all()
 TwitchConn().stop()
 CommServer.close_all()

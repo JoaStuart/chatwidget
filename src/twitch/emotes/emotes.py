@@ -12,17 +12,44 @@ class Emote:
 
     @property
     def name(self) -> str:
+        """
+        Returns:
+            str: The name of the emote
+        """
+
         return self._name
 
     @property
     def cdn(self) -> str:
+        """
+        Returns:
+            str: The CDN this emote resides on
+        """
+
         return self._cdn
 
     @property
     def files(self) -> list[str]:
+        """
+        Returns:
+            list[str]: The different types (sizes) this cdn offers
+        """
+
         return self._files
 
     def url(self, size: int) -> str:
+        """Creates a CDN url from the requested size
+
+        Args:
+            size (int): The size of the emote to request
+
+        Raises:
+            ValueError: When no emote with the given size could be found
+
+        Returns:
+            str: The url where to download the emote
+        """
+
         f = None
         for file in self._files:
             if file.startswith(str(size)):
@@ -37,6 +64,11 @@ class Emote:
 class EmoteManager(abc.ABC):
     @staticmethod
     def platforms() -> "list[Type[EmotePlatform]]":
+        """
+        Returns:
+            list[Type[EmotePlatform]]: A list of all platforms we can get emotes from
+        """
+
         from twitch.emotes.seventv import SevenTVChannel, SevenTVGlobal
         from twitch.emotes.betterttv import BetterTTVGlobal
         from twitch.emotes.frankerfacez import FrankerFaceZChannel
@@ -55,6 +87,12 @@ class EmoteManager(abc.ABC):
         self._emotes = self._load_emotes()
 
     def _load_emotes(self) -> dict[str, Emote]:
+        """Loads all emotes from all registered platforms
+
+        Returns:
+            dict[str, Emote]: The emotes loaded
+        """
+
         emotes = {}
 
         for p in self.platforms():
@@ -65,6 +103,13 @@ class EmoteManager(abc.ABC):
     def _make_text_frag(
         self, emote_string: list[dict[str, str]], text_buffer: list[str]
     ) -> None:
+        """Creates a text fragment from the contents of the text buffer and writes it into the emote string buffer
+
+        Args:
+            emote_string (list[dict[str, str]]): The emote string buffer to write to
+            text_buffer (list[str]): The text buffer to read the text from
+        """
+
         emote_string.append(
             {
                 "type": "text",
@@ -155,4 +200,10 @@ class EmotePlatform(abc.ABC):
 
     @abc.abstractmethod
     def load_emotes(self) -> dict[str, Emote]:
+        """Loads all emotes from the current platform
+
+        Returns:
+            dict[str, Emote]: The loaded emotes
+        """
+
         pass

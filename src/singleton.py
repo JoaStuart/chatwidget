@@ -1,4 +1,6 @@
 def singleton(cls):
+    """Singleton decorator for classes"""
+
     instances = {}
 
     def get_instance(*args, **kwargs):

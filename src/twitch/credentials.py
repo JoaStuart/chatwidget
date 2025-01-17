@@ -13,6 +13,11 @@ class Credentials:
 
     @property
     def access_token(self) -> Optional[str]:
+        """
+        Returns:
+            Optional[str]: The access token gotten from the OAuth
+        """
+
         return self._access_token
 
     @access_token.setter
@@ -21,6 +26,11 @@ class Credentials:
 
     @property
     def session_id(self) -> Optional[str]:
+        """
+        Returns:
+            Optional[str]: The session ID of the current WebSocket connection
+        """
+
         return self._session_id
 
     @session_id.setter
@@ -29,6 +39,11 @@ class Credentials:
 
     @property
     def emote_manager(self) -> Optional[EmoteManager]:
+        """
+        Returns:
+            Optional[EmoteManager]: The emote manager currently in use
+        """
+
         return self._emote_manager
 
     @emote_manager.setter

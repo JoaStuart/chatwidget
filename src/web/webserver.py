@@ -13,6 +13,8 @@ from widget.widget_comm import CommServer
 class HTTPHandler(BaseHTTPRequestHandler):
     @staticmethod
     def start_server() -> None:
+        """Starts the HTTP server"""
+
         with ThreadingHTTPServer(
             ("localhost", constants.HTTP_PORT), HTTPHandler
         ) as httpd:
@@ -20,6 +22,15 @@ class HTTPHandler(BaseHTTPRequestHandler):
             httpd.serve_forever()
 
     def _parse_get_params(self, get_str: str) -> dict[str, str]:
+        """Parses all get params given
+
+        Args:
+            get_str (str): The get parameters with the `?` stripped
+
+        Returns:
+            dict[str, str]: The arguments given
+        """
+
         params = {}
         if get_str == None:
             return params
@@ -34,6 +45,12 @@ class HTTPHandler(BaseHTTPRequestHandler):
         return params
 
     def _split_path(self) -> tuple[str, dict[str, str]]:
+        """Splits the path into path and get arguments
+
+        Returns:
+            tuple[str, dict[str, str]]: The path and get arguments
+        """
+
         path = self.path
         path = path.split("?", 1)
         if len(path) == 2:
@@ -48,6 +65,13 @@ class HTTPHandler(BaseHTTPRequestHandler):
     def _send_page(
         self, page_name: str, replacements: dict[bytes | str, bytes | str] = {}
     ) -> None:
+        """Sends a static page with replaced variables
+
+        Args:
+            page_name (str): The name of the file inside the web folder
+            replacements (dict[bytes  |  str, bytes  |  str], optional): The replacements to use. Defaults to {}.
+        """
+
         path = os.path.join(constants.WEB_DIR, page_name)
 
         if not os.path.isfile(path):
@@ -81,6 +105,12 @@ class HTTPHandler(BaseHTTPRequestHandler):
         self.wfile.write(data)
 
     def _authorized(self, params: dict[str, str]) -> None:
+        """The actions to be performed on an authorization callback
+
+        Args:
+            params (dict[str, str]): The get parameters given
+        """
+
         if len(params) == 0:
             self._send_page("authorize_frag.html")
             return
@@ -110,6 +140,8 @@ class HTTPHandler(BaseHTTPRequestHandler):
         self._send_page("authorized.html")
 
     def do_GET(self):
+        """Callback for GET requests"""
+
         path, params = self._split_path()
 
         PAGES: dict[str, tuple[str] | tuple[str, dict[str | bytes, str | bytes]]] = {

@@ -6,6 +6,12 @@ from twitch.emotes.emotes import Emote, EmotePlatform
 
 class FrankerFaceZChannel(EmotePlatform):
     def load_emotes(self):
+        """Loads all emotes from FrankerFaceZ's user channel
+
+        Returns:
+            dict[str, Emote]: The emotes loaded
+        """
+
         resp = requests.get(f"{constants.FRANKERFACEZ_ROOM}/{self._channel_id}")
         resp.raise_for_status()
 
@@ -18,6 +24,15 @@ class FrankerFaceZChannel(EmotePlatform):
         return emotes
 
     def _load_set(self, data: dict[str, Any]) -> dict[str, Emote]:
+        """Loads an emote set provided by FrankerFaceZ
+
+        Args:
+            data (dict[str, Any]): The data given to us by FFZ
+
+        Returns:
+            dict[str, Emote]: The emotes loaded from the set
+        """
+
         emotes = {}
         for emote in data["emoticons"]:
             name = emote["name"]

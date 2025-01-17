@@ -14,18 +14,32 @@ class TwitchMessage(abc.ABC):
 
     @abc.abstractmethod
     def message_id(self) -> str:
+        """
+        Returns:
+            str: The ID of the message
+        """
+
         pass
 
     @abc.abstractmethod
     def handle(self) -> None:
+        """Abstract method called when receiving the current message"""
+
         pass
 
 
 class TwitchMessageWelcome(TwitchMessage):
     def message_id(self):
+        """
+        Returns:
+            str: The ID of the message
+        """
+
         return "session_welcome"
 
     def handle(self):
+        """Method called when receiving the current message"""
+
         Credentials().session_id = self._data["payload"]["session"]["id"]
 
         EventTypes.register_all()
@@ -33,17 +47,31 @@ class TwitchMessageWelcome(TwitchMessage):
 
 class TwitchMessageKeepAlive(TwitchMessage):
     def message_id(self):
+        """
+        Returns:
+            str: The ID of the message
+        """
+
         return "session_keepalive"
 
     def handle(self):
-        return  # At this point we dont care about keepalive messages yet
+        """Method called when receiving the current message"""
+
+        pass  # At this point we dont care about keepalive messages yet
 
 
 class TwitchMessageNotification(TwitchMessage):
     def message_id(self):
+        """
+        Returns:
+            str: The ID of the message
+        """
+
         return "notification"
 
     def handle(self):
+        """Method called when receiving the current message"""
+
         payload = self._data["payload"]
         subscription_id = payload["subscription"]["id"]
 
@@ -52,9 +80,16 @@ class TwitchMessageNotification(TwitchMessage):
 
 class TwitchMessageReconnect(TwitchMessage):
     def message_id(self):
+        """
+        Returns:
+            str: The ID of the message
+        """
+
         return "session_reconnect"
 
     def handle(self):
+        """Method called when receiving the current message"""
+
         reconnect_url = self._data["payload"]["session"]["reconnect_url"]
 
         TwitchConn().reconnect(reconnect_url)
@@ -62,9 +97,16 @@ class TwitchMessageReconnect(TwitchMessage):
 
 class TwitchMessageRevocation(TwitchMessage):
     def message_id(self):
+        """
+        Returns:
+            str: The ID of the message
+        """
+
         return "revocation"
 
     def handle(self):
+        """Method called when receiving the current message"""
+
         LOG.warning("The user has revoked the permissions!")
 
         TwitchConn().stop()
@@ -81,10 +123,25 @@ class MessageTypes(Enum):
         self._msg_cls = msg_cls
 
     def for_data(self, json_data: dict[str, Any]) -> TwitchMessage:
+        """Creates the event handler for the given message data
+
+        Args:
+            json_data (dict[str, Any]): The data to create the event for
+
+        Returns:
+            TwitchMessage: The constructed message handler
+        """
+
         return self._msg_cls(json_data)
 
     @staticmethod
     def handle(json_data: dict[str, Any]) -> None:
+        """Handles a message given in JSON format by Twitch
+
+        Args:
+            json_data (dict[str, Any]): The data of the message
+        """
+
         msg_type = json_data["metadata"]["message_type"]
 
         for _, cls in MessageTypes._member_map_.items():

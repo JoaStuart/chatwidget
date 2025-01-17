@@ -26,6 +26,8 @@ class CommServer:
 
     @staticmethod
     def recv_thread() -> None:
+        """Starts the receive thread for the communication server"""
+
         srv = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         srv.bind(("127.0.0.1", constants.HTTP_PORT + 1))
         srv.listen(1)
@@ -46,12 +48,20 @@ class CommServer:
 
     @staticmethod
     def broadcast(message: dict[str, Any]) -> None:
+        """Broadcasts the given message to all connected WebSockets
+
+        Args:
+            message (dict[str, Any]): The message to broadcast
+        """
+
         data_msg = json.dumps(message)
         for connection in CommServer.CONNECTIONS:
             connection.send(data_msg)
 
     @staticmethod
     def close_all() -> None:
+        """Closes all open connections"""
+
         for connection in CommServer.CONNECTIONS:
             connection.close()
 
@@ -61,9 +71,21 @@ class CommServer:
         self._closing: bool = False
 
     def send(self, message: str) -> None:
+        """Sends a message to the current WebSocket
+
+        Args:
+            message (str): The message to send
+        """
+
         self._sock.sendall(self._conn.send(TextMessage(message)))
 
     def handle(self, peername: tuple[str, int]) -> None:
+        """Handles the current WebSocket connection
+
+        Args:
+            peername (tuple[str, int]): The peername the connection comes from
+        """
+
         LOG.info(f"WebSocket incoming from {peername}")
 
         try:
@@ -74,10 +96,14 @@ class CommServer:
             self._sock.close()
 
     def close(self) -> None:
+        """Closes the current connection"""
+
         self._send_event(CloseConnection(1000, "Closing connection."))
         self._closing = True
 
     def _read(self) -> None:
+        """Reads data from the WebSocket and handles it"""
+
         while True:
             data = self._sock.recv(4096)
             if not data:
@@ -115,6 +141,12 @@ class CommServer:
                     )
 
     def _recv_msg(self, evt: TextMessage) -> None:
+        """Callback for receiving text messages
+
+        Args:
+            evt (TextMessage): The message received
+        """
+
         try:
             data = json.loads(evt.data)
             event = data["event"]
@@ -128,6 +160,8 @@ class CommServer:
             pass
 
     def _send_event(self, *event: Event) -> None:
+        """Sends an event to the current WebSocket"""
+
         for e in event:
             data = self._conn.send(e)
             self._sock.sendall(data)
