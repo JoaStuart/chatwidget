@@ -156,6 +156,15 @@ class CommServer:
                 val = data["data"]["value"]
                 Config()[key] = val
 
+            elif event == "config_reset":
+                cfg = Config()
+                cfg.reset_all()
+
+            elif event == "shutdown":
+                from main import SHUTDOWN
+
+                SHUTDOWN.set()
+
         except Exception:
             pass
 

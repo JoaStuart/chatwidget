@@ -3,6 +3,4 @@ TODO:
 - BetterTTV Channel emote
 - Design for the `authorized.html`
 - Make the main thread also do something?
-- Reset config values
-- Stopping server through dashboard?
-- Comments!
+- Test all changes!

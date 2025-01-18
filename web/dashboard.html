@@ -81,6 +81,26 @@
           pattern="(?:[0-9]{2,}|[1-9])(?:.[0-9]+)?"
         />
       </div>
+      <div class="setting">
+        <span>Reset config</span>
+        <input
+          type="button"
+          class="description"
+          data-desc="Reset all values to their default. (Cannot be reverted!)"
+          id="reset"
+          value="Reset"
+        />
+      </div>
+      <div class="setting">
+        <span>Shutdown server</span>
+        <input
+          type="button"
+          class="description"
+          data-desc="Shuts the backend down. (Same as ^C inside terminal window.)"
+          id="shutdown"
+          value="Shutdown"
+        />
+      </div>
       <input type="submit" value="Save" style="display: none" />
     </form>
     <div

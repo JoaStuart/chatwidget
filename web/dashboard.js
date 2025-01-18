@@ -110,4 +110,22 @@ const connectSock = () => {
   return s;
 };
 
+document.getElementById("reset").addEventListener("click", () => {
+  sock.send(
+    JSON.stringify({
+      event: "config_reset",
+      data: {},
+    })
+  );
+});
+
+document.getElementById("shutdown").addEventListener("click", () => {
+  sock.send(
+    JSON.stringify({
+      event: "shutdown",
+      data: {},
+    })
+  );
+});
+
 let sock = connectSock();

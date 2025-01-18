@@ -1,8 +1,6 @@
-import random
-from threading import Thread
-from time import sleep
+from threading import Event, Thread
 from log import LOG
-from twitch.events import EventTypes, TwitchEvent
+from twitch.events import EventTypes
 from twitch.twitch import TwitchConn
 from web.webserver import HTTPHandler
 from widget.combo import ComboManager
@@ -16,13 +14,15 @@ if __name__ != "__main__":
 # Start services in background threads
 Thread(target=HTTPHandler.start_server, name="WebServer", daemon=True).start()
 Thread(target=ComboManager().combo_thread, name="ComboManager", daemon=True).start()
-Thread(target=CommServer.recv_thread, name="CommsManager", daemon=True).start()
+Thread(target=CommServer.recv_thread, name="CommsServer", daemon=True).start()
 
 
-# Wait until the user presses ^C
+SHUTDOWN = Event()
+
+# Wait until the user presses ^C or a shutdown occurs
 try:
     while True:
-        sleep(10)
+        SHUTDOWN.wait()
 except KeyboardInterrupt:
     LOG.info("Shutting down...")
 

@@ -98,6 +98,18 @@ class Config:
         self._write()
         return c["current"]
 
+    def reset_all(self) -> None:
+        """Resets all values to their default"""
+
+        for _, i in self._config.items():
+            i["current"] = i["default"]
+
+        self._write()
+
+        from widget.widget_comm import CommServer
+
+        CommServer.broadcast({"event": "config", "data": self.dump()})
+
     def add_change_callback(self, key: str, callback: Callable[[], None]) -> None:
         """Adds a callback which gets called when the value of key changes
 
