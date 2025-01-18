@@ -70,15 +70,17 @@ class EmoteManager(abc.ABC):
         """
 
         from twitch.emotes.seventv import SevenTVChannel, SevenTVGlobal
-        from twitch.emotes.betterttv import BetterTTVGlobal
-        from twitch.emotes.frankerfacez import FrankerFaceZChannel
+        from twitch.emotes.betterttv import BetterTTVChannel, BetterTTVGlobal
+        from twitch.emotes.frankerfacez import FrankerFaceZChannel, FrankerFaceZGlobal
 
         return [
             # Global emotes
             SevenTVGlobal,
             BetterTTVGlobal,
+            FrankerFaceZGlobal,
             # Channel emotes
             SevenTVChannel,
+            BetterTTVChannel,
             FrankerFaceZChannel,
         ]
 

@@ -72,6 +72,9 @@ SEVENTV_GLOBAL = (
 
 # BetterTTV endpoints
 BETTERTTV_EMOTES = "https://api.betterttv.net/3/cached/emotes/global"
+BETTERTTV_USER = "https://api.betterttv.net/3/cached/users/twitch"
+BETTERTTV_CDN = "https://cdn.betterttv.net/emote"
 
 # FFZ user endpoint
 FRANKERFACEZ_ROOM = "https://api.frankerfacez.com/v1/room/id"
+FRANKERFACEZ_GLOBAL = "https://api.frankerfacez.com/v1/set/global"

@@ -42,3 +42,15 @@ class FrankerFaceZChannel(EmotePlatform):
             emotes[name] = Emote(name, cdn, sizes)
 
         return emotes
+
+
+class FrankerFaceZGlobal(FrankerFaceZChannel):
+    def load_emotes(self):
+
+        resp = requests.get(constants.FRANKERFACEZ_GLOBAL)
+        resp.raise_for_status()
+
+        sets = resp.json()["sets"]
+
+        for _, set in sets.items():
+            self._load_set(set)
