@@ -30,8 +30,7 @@ jobs:
       - name: Windows dependencies
         if: runner.os == 'Windows'
         run: |
-          choco install msys2
-          msys2 -c "pacman -S --noconfirm make"
+          choco install make
 
       - name: Python dependencies
         run: |

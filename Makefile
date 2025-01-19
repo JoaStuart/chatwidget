@@ -1,5 +1,5 @@
 main = src/main.py
-name = ChatWidget.exe
+name = ChatWidget
 
 run:
 	python $(main)
