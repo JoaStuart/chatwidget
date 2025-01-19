@@ -43,7 +43,7 @@ jobs:
         run: make build
 
       - name: Upload built executable
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: pyinstaller-build
           path: dist/
