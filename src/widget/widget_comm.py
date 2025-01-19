@@ -16,6 +16,7 @@ from wsproto.events import (
 
 import constants
 from log import LOG
+from twitch.credentials import Credentials
 from twitch.twitch import TwitchConn
 from widget.config import Config
 
@@ -161,9 +162,7 @@ class CommServer:
                 cfg.reset_all()
 
             elif event == "shutdown":
-                from main import SHUTDOWN
-
-                SHUTDOWN.set()
+                Credentials().shutdown.set()
 
         except Exception:
             pass

@@ -1,5 +1,6 @@
 from threading import Event, Thread
 from log import LOG
+from twitch.credentials import Credentials
 from twitch.events import EventTypes
 from twitch.twitch import TwitchConn
 from web.webserver import HTTPHandler
@@ -17,14 +18,13 @@ Thread(target=ComboManager().combo_thread, name="ComboManager", daemon=True).sta
 Thread(target=CommServer.recv_thread, name="CommsServer", daemon=True).start()
 
 
-SHUTDOWN = Event()
-
 # Wait until the user presses ^C or a shutdown occurs
 try:
-    while True:
-        SHUTDOWN.wait()
+    Credentials().shutdown.wait()
 except KeyboardInterrupt:
-    LOG.info("Shutting down...")
+    pass
+
+LOG.info("Shutting down...")
 
 # Shut down all services
 EventTypes.delete_all()
