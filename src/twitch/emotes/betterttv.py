@@ -22,7 +22,7 @@ class BetterTTVChannel(EmotePlatform):
         files = ["1x", "2x", "3x"]
 
         for e in emote_set:
-            name = e["clap"]
+            name = e["code"]
             emote_id = e["id"]
 
             emotes[name] = Emote(name, f"{constants.BETTERTTV_CDN}/{emote_id}", files)
