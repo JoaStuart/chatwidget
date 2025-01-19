@@ -2,3 +2,6 @@ TODO:
 - Design for the `authorized.html`
 - Make the main thread also do something?
 - Test all changes!
+-> Shutdown not working
+
+- Reset config file to default before final commit!
