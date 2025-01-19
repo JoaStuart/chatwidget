@@ -1,4 +1,5 @@
 import os
+import sys
 
 
 # HTTP server
@@ -6,9 +7,13 @@ HTTP_PORT = 4150
 FALLBACK_MIME = "application/octet-stream"
 
 # Folders
-SRC_DIR = os.path.dirname(__file__)
-ROOT_DIR = os.path.join(SRC_DIR, "..")
-WEB_DIR = os.path.join(ROOT_DIR, "web")
+if getattr(sys, "frozen", False):
+    ROOT_DIR = sys._MEIPASS
+    WEB_DIR = os.path.join(ROOT_DIR, "web")
+else:
+    _SRC_DIR = os.path.dirname(__file__)
+    ROOT_DIR = os.path.join(_SRC_DIR, "..")
+    WEB_DIR = os.path.join(ROOT_DIR, "web")
 
 # Twitch API endpoints
 TWITCH_ENDPOINT = "wss://eventsub.wss.twitch.tv/ws"

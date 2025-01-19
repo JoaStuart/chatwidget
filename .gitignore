@@ -2,3 +2,8 @@
 **/__pycache__/**
 
 **/.vscode
+
+# Ignore build files
+**/build
+**/dist
+main.spec

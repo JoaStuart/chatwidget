@@ -30,5 +30,3 @@ LOG.info("Shutting down...")
 EventTypes.delete_all()
 TwitchConn().stop()
 CommServer.close_all()
-
-exit(0)
