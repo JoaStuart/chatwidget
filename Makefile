@@ -1,17 +1,15 @@
 main = src/main.py
-data = src web config.json
+name = ChatWidget.exe
 
 run:
 	python $(main)
 
 build-and-run:
 	$(MAKE) build
-	dist/main.exe
+	dist/$(name)
 
-build: src/* web/*
-	pyinstaller --onefile --add-data "web:web" --add-data "config.json:." $(main)
+build: src/* web/* icon/*
+	pyinstaller --onefile --console --add-data "web:web" --add-data "config.json:." -i icon/sized.ico -n $(name) $(main)
 
 clean:
-	-rm -r build
-	-rm -r dist
-	-rm main.spec
+	-rm -rf dist build *.spec

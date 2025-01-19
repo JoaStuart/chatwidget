@@ -1,0 +1,49 @@
+name: Build PyInstaller Executable
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.12
+
+      - name: Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install make
+
+      - name: Windows dependencies
+        if: runner.os == 'Windows'
+        run: |
+          choco install msys2
+          msys2 -c "pacman -S --noconfirm make"
+
+      - name: Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Make build
+        run: make build
+
+      - name: Upload built executable
+        uses: actions/upload-artifact@v2
+        with:
+          name: pyinstaller-build
+          path: dist/
