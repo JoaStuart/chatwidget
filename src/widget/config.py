@@ -3,7 +3,6 @@ import os
 from typing import Any, Callable
 
 import constants
-from log import LOG
 from singleton import singleton
 
 

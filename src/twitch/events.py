@@ -5,7 +5,6 @@ from typing import Any, Optional
 
 import requests
 
-from log import LOG
 import constants
 from twitch.credentials import Credentials
 from twitch.emotes.emotes import EmoteManager
