@@ -4,7 +4,7 @@
 ![License](https://img.shields.io/github/license/joastuart/chatwidget)
 ![Last Commit](https://img.shields.io/github/last-commit/joastuart/chatwidget)
 [![OBS Studio](https://img.shields.io/badge/OBS_Studio-supported-green?logo=obsstudio)](https://obsproject.net/)
-[![Twitch API](https://img.shields.io/badge/Twitch-API-%239146FF?logo=twitch)](https://dev.twtich.tv/)
+[![Twitch API](https://img.shields.io/badge/Twitch-API-%239146FF?logo=twitch)](https://dev.twitch.tv/)
 
 This project is a chat combo widget for twitch, inspired by the one [**@Charborg**](https://twitch.tv/charborg) uses.
 
