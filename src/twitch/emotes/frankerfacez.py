@@ -52,5 +52,8 @@ class FrankerFaceZGlobal(FrankerFaceZChannel):
 
         sets = resp.json()["sets"]
 
+        emotes = {}
         for _, set in sets.items():
-            self._load_set(set)
+            emotes |= self._load_set(set)
+
+        return emotes

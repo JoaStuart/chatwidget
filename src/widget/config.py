@@ -8,7 +8,7 @@ from singleton import singleton
 
 @singleton
 class Config:
-    FILE = os.path.join(constants.ROOT_DIR, "config.json")
+    FILE = os.path.join(constants.CONFIG_DIR, "config.json")
 
     def __init__(self):
         self._config: dict[str, Any] = self._load()

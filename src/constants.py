@@ -6,6 +6,8 @@ import sys
 HTTP_PORT = 4150
 FALLBACK_MIME = "application/octet-stream"
 
+CONFIG_NAME = "config.json"
+
 # Folders
 if getattr(sys, "frozen", False):
     ROOT_DIR = sys._MEIPASS
@@ -14,6 +16,17 @@ else:
     _SRC_DIR = os.path.dirname(__file__)
     ROOT_DIR = os.path.join(_SRC_DIR, "..")
     WEB_DIR = os.path.join(ROOT_DIR, "web")
+
+if os.name == "nt":
+    CONFIG_DIR = os.path.join(os.getenv("APPDATA"), "ChatWidget")
+else:
+    CONFIG_DIR = os.path.join(os.getenv("HOME"), ".config", "ChatWidget")
+
+os.makedirs(CONFIG_DIR, exist_ok=True)
+if not os.path.exists(os.path.join(CONFIG_DIR, CONFIG_NAME)):
+    with open(os.path.join(ROOT_DIR, CONFIG_NAME), "r") as rf:
+        with open(os.path.join(CONFIG_DIR, CONFIG_NAME), "w") as wf:
+            wf.write(rf.read())
 
 # Twitch API endpoints
 TWITCH_ENDPOINT = "wss://eventsub.wss.twitch.tv/ws"

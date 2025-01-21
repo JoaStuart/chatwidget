@@ -170,11 +170,24 @@ class HTTPHandler(BaseHTTPRequestHandler):
                 {"{{WS_PORT}}": str(constants.HTTP_PORT + 1)},
             ),
             "/dashboard.css": ("dashboard.css",),
+            "/favicon.ico": ("favicon.ico",),
         }
 
         match path:
+            case "/":
+                self.send_response(302, "Redirect")
+                self.send_header(
+                    "Location",
+                    "https://github.com/JoaStuart/chatwidget?tab=readme-ov-file#2-add-the-dashboard-to-obs",
+                )
+                self.end_headers()
+
             case "/authorized":
                 self._authorized(params)
+
+            case "/reconnect":
+                self.send_response(200, "OK")
+                self.end_headers()
 
             case _:
                 page = PAGES.get(path, None)

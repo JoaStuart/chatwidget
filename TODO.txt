@@ -1,5 +1,0 @@
-TODO:
-- Design for the `authorized.html`
-- Test all changes!
-
-- Reset config file to default before final commit!
