@@ -1,10 +1,8 @@
 # Twitch Chat Widget
 
 [![Python 3.12+](https://img.shields.io/badge/Python-3.12%2B-blue?logo=python)](https://www.python.org/)
-
-<!--[![License](https://img.shields.io/github/license/JoaStuart/chatwidget)](https://github.com/JoaStuart/chatwidget?tab=MIT-1-ov-file)
-![Last Commit](https://img.shields.io/github/last-commit/JoaStuart/chatwidget)-->
-
+![License](https://img.shields.io/github/license/JoaStuart/chatwidget)
+![Last Commit](https://img.shields.io/github/last-commit/JoaStuart/chatwidget)
 [![OBS Studio](https://img.shields.io/badge/OBS_Studio-supported-green?logo=obsstudio)](https://obsproject.net/)
 [![Twitch API](https://img.shields.io/badge/Twitch-API-%239146FF?logo=twitch)](https://dev.twtich.tv/)
 
@@ -18,8 +16,57 @@ The widget tracks chat messages in real-time and supports emotes from Twitch as 
 
 ### 0. Prerequisites
 
+- [**OBS Studio**](https://obsproject.com/download) (you likely already have this installed).
+
+### 1. Download and Launch the Application
+
+1. Go to the [**Releases**](https://github.com/JoaStuart/chatwidget/releases) section of the repository.
+2. Download the latest release for your operating system.
+3. Run the downloaded file.
+
+### 2. Add the Dashboard to OBS
+
+1. In OBS, go to **Docks** > **Custom Browser Docks...**.
+2. Enter the following:
+   - **Dock Name**: `ChatWidget`
+   - **URL**: `http://localhost:4150/dashboard`
+3. Click **Apply** and close the window.
+4. Position the dock as needed. This dashboard allows you to configure the widget.
+
+### 3. Add the Widget to OBS
+
+1. In the desired scene, add a **Browser** source.
+2. Enter the following in the **URL** field:  
+   `http://localhost:4150/widget`
+3. Click **OK** to close the configuration window.
+
+### 4. Configure and Connect to Twitch
+
+1. Open the configuration dashboard in OBS.
+2. Enter your Twitch username in the **Broadcaster** field (other fields can be left as is for now).
+3. Click **Connect** at the top and authorize the application to access your Twitch account.
+
+Once connected, chat combos will appear in the widget automatically. Third-party emotes from **BetterTTV**, **SevenTV**, and **FrankerFaceZ** will also load automatically.
+
+### Optional: Displaying Another Streamer’s Chat
+
+If you want to show chat messages from a streamer other than the account you're connected with:
+
+1. Open the **Configuration Dashboard** in OBS.
+2. Enable the **Reading user** checkbox.
+3. Enter:
+   - Your connected Twitch username in the **Reading user** field.
+   - The name of the streamer whose chat you want to display in the **Broadcaster** field.
+
+Changes should take effect within seconds.
+
+## Building / Running from source
+
+### 0. Prerequisites for building / running
+
 - [**Python 3.12**](https://www.python.org/downloads) or higher.
 - [**Git**](https://git-scm.com/downloads) (optional, for cloning the repository).
+- [**Make**](https://www.gnu.org/software/make/).
 - [**OBS Studio**](https://obsproject.com/download) (you likely already have this installed).
 
 ### 1. Clone the Repository
@@ -44,52 +91,39 @@ pip install -r requirements.txt
 
 <sub>_Note: Replace `pip` with `python -m pip` or `pip3` depending on your system._</sub>
 
-### 3. Start the Application
+### 3.1. Running the application
 
-Run the following commands:
+Run the following command:
 
 ```bash
-cd src
-python main.py
+make run
 ```
 
-<sub>_Note: Replace `python` with `python3.12` or the appropriate command for your system._</sub>
+### 3.2. Building the application
 
-### 4. Add the Dashboard to OBS
+Run the following command:
 
-1. In OBS, go to **Docks** > **Custom Browser Docks...**.
-2. Enter the following:
-   - **Dock Name**: `ChatWidget`
-   - **URL**: `http://localhost:4150/dashboard`
-3. Click **Apply** and close the window.
-4. Position the dock as needed. This dashboard allows you to configure the widget.
+```bash
+make build
+```
 
-### 5. Add the Widget to OBS
+The generated binary will be located inside the `dist` directory.
 
-1. In the desired scene, add a **Browser** source.
-2. Enter the following in the **URL** field:  
-   `http://localhost:4150/widget`
-3. Click **OK** to close the configuration window.
+### 4. Setting up
 
-### 6. Configure and Connect to Twitch
+For setup, start the application and continue with [adding the Dashboard to OBS](#2-add-the-dashboard-to-obs).
 
-1. Open the configuration dashboard in OBS.
-2. Enter your Twitch username in the **Broadcaster** field (other fields can be left as is for now).
-3. Click **Connect** at the top and authorize the application to access your Twitch account.
+## Implementation
 
-Once connected, chat combos will appear in the widget automatically. Third-party emotes from **BetterTTV**, **SevenTV**, and **FrankerFaceZ** will also load automatically.
+The widget is written in Python, leveraging the built-in `http.server` module to serve the widget as a browser source. This choice keeps the implementation lightweight and avoids the overhead of more advanced frameworks.
 
-## Reading a different chat
+For the frontend, plain HTML, CSS, and JavaScript are used to render the widget. This ensures faster rendering in OBS compared to frameworks that rely on heavy JavaScript rendering.
 
-Reading the chat of a different streamer than the account you connected the application with is also supported, but a little more config setup is needed.
+The widget integrates with the Twitch API to retrieve chat messages and emotes, while also supporting popular third-party emote services like BetterTTV, SevenTV, and FFZ through their respective APIs.
 
-In the Configuration Dashboard ...
+To ensure quick communication between the backend and frontend, the widget runs locally. A prebuilt version is provided for ease of use.
 
-- ... tick the Checkbox next to `Reading user`, ...
-- ... enter the name of the account you connected the application with in the field to the right and ...
-- ... enter the name of the streamer whose chat to display into the field next to `Broadcaster`.
-
-Again, changes should be visible within seconds.
+Customization is made simple through a configuration UI, available as an OBS dock. This allows users to adjust settings easily without leaving their streaming software.
 
 ## Acknowledgments
 
@@ -103,18 +137,6 @@ Special thanks to the following services and APIs for making this project possib
 - [**FrankerFaceZ (FFZ)**](https://www.frankerfacez.com): For additional emotes and chat customization options.
 
 Thank you to the OBS community for making streaming tools easy to integrate and configure!
-
-## Implementation
-
-The widget is written in Python, leveraging the built-in `http.server` module to serve the widget as a browser source. This choice keeps the implementation lightweight and avoids the overhead of more advanced frameworks.
-
-For the frontend, plain HTML, CSS, and JavaScript are used to render the widget. This ensures faster rendering in OBS compared to frameworks that rely on heavy JavaScript rendering.
-
-The widget integrates with the Twitch API to retrieve chat messages and emotes, while also supporting popular third-party emote services like BetterTTV, SevenTV, and FFZ through their respective APIs.
-
-To ensure quick communication between the backend and frontend, the widget runs locally. A prebuilt version is provided for ease of use.
-
-Customization is made simple through a configuration UI, available as an OBS dock. This allows users to adjust settings easily without leaving their streaming software.
 
 ## Future plans
 

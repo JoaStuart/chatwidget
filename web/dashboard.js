@@ -29,6 +29,7 @@ const sendChange = (key, val) => {
  */
 const changelistener = (ev) => {
   if (ev) ev.preventDefault();
+  document.activeElement.blur();
 
   for (const key of Object.keys(config)) {
     const el = document.getElementById(key);
@@ -64,7 +65,7 @@ for (const descripted of document.getElementsByClassName("description")) {
  * Test for whether the backend server is up again
  */
 const reloadTest = () => {
-  fetch("/")
+  fetch("/reconnect")
     .then(() => {
       sock = connectSock();
     })
@@ -95,18 +96,22 @@ const connectSock = () => {
       }
     } else if (msg.event === "config_change") {
       const el = document.getElementById(msg.data.key);
-      config[msg.data.key] = conf[msg.data.key];
+      config[msg.data.key] = msg.data.value;
 
       if (typeof msg.data.key === "boolean") el.checked = conf[msg.data.key];
-      else el.value = conf[msg.data.key];
+      else el.value = msg.data.value;
     } else if (msg.event === "connect") {
       const connected = msg.data.connected;
       connect.disabled = connected;
     }
   });
 
-  s.addEventListener("close", () => reloadTest);
+  s.addEventListener("close", () => {
+    document.getElementById("reconnect").style.display = "flex";
+    reloadTest();
+  });
 
+  document.getElementById("reconnect").style.display = "none";
   return s;
 };
 

@@ -6,6 +6,10 @@
     <link rel="stylesheet" href="dashboard.css" />
   </head>
   <body>
+    <div id="reconnect" style="display: none">
+      <span class="beacon">Reconnecting...</span>
+    </div>
+
     <form id="config">
       <div class="setting">
         <span>Twitch</span>
@@ -96,12 +100,12 @@
         <input
           type="button"
           class="description"
-          data-desc="Shuts the backend down. (Same as ^C inside terminal window.)"
+          data-desc="Shuts the backend down. (Same as closing the terminal window.)"
           id="shutdown"
           value="Shutdown"
         />
       </div>
-      <input type="submit" value="Save" style="display: none" />
+      <input type="submit" value="Save" id="save" style="display: none" />
     </form>
     <div
       class="descriptionbox description"

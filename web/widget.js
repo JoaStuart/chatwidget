@@ -107,7 +107,7 @@ const removeCombo = (msg) => {
  * Tests if the backend is up again
  */
 const reloadTest = () => {
-  fetch("/")
+  fetch("/reconnect")
     .then(() => {
       sock = connect();
     })
@@ -129,6 +129,10 @@ const connect = () => {
   });
 
   s.addEventListener("close", () => {
+    for (const c of Object.keys(activeCombos)) {
+      removeCombo({ data: { text: c } });
+    }
+
     notification.animate(
       { transform: "translateX(0px)" },
       { duration: 400, fill: "forwards" }

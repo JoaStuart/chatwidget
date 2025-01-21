@@ -1,15 +1,15 @@
 {
   "broadcaster_id": {
     "default": "",
-    "current": "insym"
+    "current": ""
   },
   "different_user": {
     "default": false,
-    "current": true
+    "current": false
   },
   "user_id": {
     "default": "",
-    "current": "joajdx"
+    "current": ""
   },
   "max_combo": {
     "default": 4,
@@ -17,7 +17,7 @@
   },
   "combo_threshold": {
     "default": 3,
-    "current": 2
+    "current": 3
   },
   "combo_timeout": {
     "default": 5.0,
